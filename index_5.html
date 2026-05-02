@@ -363,6 +363,9 @@ const contratEdit=employes.map(e=>e.contrat);
 // CP acquis par défaut (jours)
 const cpAcquis=employes.map(()=>25);
 let historique=[];
+let terrainStatuts=["ouvert","ouvert","ouvert","ouvert"];
+let terrainTarifs=[15,15,15,15];
+let terrainNotes=["","","",""];
 
 // ── UTILITAIRES ────────────────────────────────────────────
 function getISOWeek(date){
