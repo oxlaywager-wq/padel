@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestion Padel</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f0f2f5;color:#1a1a1a;min-height:100vh}
+header{background:#111111;padding:16px 30px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+header h1{color:#FFD700;font-size:20px;font-weight:700}
+header p{color:#FFD700;font-size:12px;margin-top:2px;opacity:.85}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.header-right select{padding:5px 10px;border-radius:8px;border:none;font-size:13px;background:rgba(255,215,0,.15);color:#FFD700;cursor:pointer;border:1px solid rgba(255,215,0,.3)}
+.header-right select option{color:#1a1a1a;background:#fff}
+.hbtn{padding:7px 14px;background:rgba(255,215,0,.15);color:#FFD700;border:1.5px solid rgba(255,215,0,.4);border-radius:8px;cursor:pointer;font-size:12px;font-weight:700}
+.hbtn:hover{background:rgba(255,215,0,.3)}
+.hbtn.danger{background:rgba(220,53,69,.3);border-color:rgba(255,100,100,.5)}
+.tabs{display:flex;background:#fff;border-bottom:2px solid #e0e0e0;padding:0 24px;overflow-x:auto}
+.tab{padding:13px 18px;cursor:pointer;font-size:13px;font-weight:600;color:#888;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap}
+.tab.active{color:#1A5276;border-bottom-color:#1A5276}
+.tab:hover{color:#1A5276}
+.content{padding:20px 24px;max-width:1300px;margin:0 auto}
+.page{display:none}.page.active{display:block}
+.card{background:#fff;border-radius:12px;padding:18px 22px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.card-title{font-size:14px;font-weight:700;color:#1A5276;margin-bottom:14px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.metric{background:#fff;border-radius:10px;padding:14px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.metric-label{font-size:10px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.metric-val{font-size:22px;font-weight:700;color:#1A5276}
+.sem-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.sem-btn{padding:6px 13px;border:2px solid #ddd;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;background:#fff;color:#888;transition:all .2s;text-align:center}
+.sem-btn.active{background:#1A5276;color:#fff;border-color:#1A5276}
+.sem-btn:hover:not(.active){border-color:#1ABC9C;color:#1ABC9C}
+.sem-btn .sem-num{font-size:10px;display:block;opacity:.75;font-weight:400;margin-top:1px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:#f7f9fc;padding:9px 10px;text-align:left;font-weight:700;color:#555;border-bottom:2px solid #e8ecf0;white-space:nowrap}
+#planning-tbl thead th{padding:7px 4px;text-align:center;vertical-align:middle;border-bottom:2px solid #e8ecf0;white-space:nowrap;box-sizing:border-box}
+#planning-tbl thead th:first-child{text-align:left;padding:7px 10px;min-width:120px;width:120px}
+#planning-tbl tbody td{padding:4px 3px;vertical-align:middle;border-bottom:1px solid #f0f0f0;box-sizing:border-box}
+#planning-tbl tbody td:first-child{padding:6px 10px}
+tbody td{padding:8px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+tbody tr:hover td{background:#f7fbff}
+tbody tr:last-child td{border-bottom:none}
+tfoot td{padding:9px 10px;font-weight:700;background:#f0f4f8;color:#1A5276}
+.emp-cell{display:flex;align-items:center;gap:8px}
+.avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+input[type=number],input[type=text],select{padding:5px 8px;border:1.5px solid #dde3ea;border-radius:6px;font-size:12px;background:#fff;color:#1a1a1a}
+input[type=number]:focus,input[type=text]:focus,select:focus{outline:none;border-color:#1ABC9C;background:#f0fff8}
+.planning-input{border:1.5px solid #eee;border-radius:6px;padding:4px 5px;font-size:11px;text-align:center;width:90px;background:#fafafa;color:#1a1a1a}
+.planning-input:focus{outline:none;border-color:#1ABC9C;background:#f0fff8}
+.planning-input.abs-cp{background:#fff3cd;border-color:#f0ad4e;color:#856404}
+.planning-input.abs-mal{background:#f8d7da;border-color:#dc3545;color:#721c24}
+.planning-input.abs-fer{background:#d1ecf1;border-color:#17a2b8;color:#0c5460}
+.planning-input.over{background:#ffe0e0;border-color:#dc3545;color:#721c24}
+.planning-input.under{background:#fff3cd;border-color:#ffc107;color:#856404}
+.total-h{font-weight:700;color:#1A5276;text-align:center;background:#e8f4fd;padding:4px 8px;border-radius:6px;font-size:12px}
+.total-h.over{background:#ffe0e0;color:#dc3545}
+.total-h.under{background:#fff3cd;color:#856404}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-green{background:#d5f5e3;color:#1e8449}
+.badge-amber{background:#fdebd0;color:#b7770d}
+.badge-red{background:#fadbd8;color:#922b21}
+.badge-blue{background:#d6eaf8;color:#1a5276}
+.badge-cp{background:#fff3cd;color:#856404}
+.badge-mal{background:#f8d7da;color:#721c24}
+.params-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.param-item label{font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px}
+.param-row{display:flex;align-items:center;gap:6px}
+.param-row input{width:75px}
+.week-header{background:#e8f4fd;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:700;color:#1A5276;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.note-input{width:100%;padding:3px 6px;font-size:11px;border:1.5px solid #eee;border-radius:6px;background:#fffde7;color:#555;font-style:italic}
+.note-input:focus{outline:none;border-color:#ffc107;background:#fffde7}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;font-size:11px}
+.legend-item{display:flex;align-items:center;gap:4px}
+.legend-dot{width:12px;height:12px;border-radius:3px}
+/* CP tracker */
+.cp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.cp-card{background:#fff;border-radius:10px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.08);text-align:center}
+.cp-name{font-weight:700;font-size:13px;margin-bottom:8px}
+.cp-bar-wrap{background:#eee;border-radius:10px;height:8px;margin:6px 0}
+.cp-bar{background:#1ABC9C;height:8px;border-radius:10px;transition:width .3s}
+.cp-nums{font-size:11px;color:#888;display:flex;justify-content:space-between}
+/* Historique */
+.hist-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.hist-card{background:#fff;border-radius:10px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.08);cursor:pointer;border:2px solid transparent;transition:border-color .2s}
+.hist-card:hover{border-color:#1ABC9C}
+.hist-card.active-hist{border-color:#1A5276}
+.hist-month{font-weight:700;font-size:13px;color:#1A5276}
+.hist-detail{font-size:11px;color:#888;margin-top:4px}
+/* PDF print */
+
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center}
+.modal{background:#fff;border-radius:14px;padding:24px;min-width:340px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.25)}
+.modal-title{font-size:15px;font-weight:700;color:#1A5276;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.modal-close{cursor:pointer;font-size:20px;color:#aaa;line-height:1}
+.modal-close:hover{color:#333}
+.time-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-height:320px;overflow-y:auto;margin-bottom:14px}
+.time-slot{padding:7px 4px;text-align:center;border:1.5px solid #e0e8f0;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:#1A5276;background:#f7fbff;transition:all .15s;user-select:none}
+.time-slot:hover{background:#1A5276;color:#fff;border-color:#1A5276}
+.time-slot.selected-start{background:#1ABC9C;color:#fff;border-color:#1ABC9C}
+.time-slot.selected-end{background:#1A5276;color:#fff;border-color:#1A5276}
+.time-slot.in-range{background:#e8f4fd;border-color:#1ABC9C;color:#1A5276}
+.time-slot.abs-slot{background:#fff3cd;color:#856404;border-color:#f0ad4e}
+.time-slot.abs-slot:hover{background:#f0ad4e;color:#fff}
+.modal-result{background:#f0fff8;border:1.5px solid #1ABC9C;border-radius:8px;padding:10px;text-align:center;font-weight:700;color:#1A5276;margin-bottom:12px;font-size:14px;min-height:40px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.modal-btn{padding:8px 18px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:700}
+.modal-btn-ok{background:#1A5276;color:#fff}
+.modal-btn-ok:hover{background:#148F77}
+.modal-btn-cancel{background:#eee;color:#555}
+.modal-btn-clear{background:#fadbd8;color:#922b21}
+.abs-btns{display:flex;gap:6px;margin-bottom:12px}
+.abs-btn{flex:1;padding:7px;border-radius:8px;border:2px solid;cursor:pointer;font-size:12px;font-weight:700;background:#fff;transition:all .15s}
+.abs-btn:hover{opacity:.8}
+.abs-btn.active{color:#fff}
+.quick-slot{padding:6px 10px;border:1.5px solid #1ABC9C;border-radius:8px;background:#f0fff8;color:#1A5276;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+.quick-slot:hover{background:#1ABC9C;color:#fff}
+
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  body{background:#fff!important;margin:0;padding:0}
+  header,.tabs,.sem-tabs,.hbtn,.legend,.no-print,
+  #add-emp-row,#planning-metrics,.modal-overlay{display:none!important}
+  /* Cacher toutes les pages sauf le planning */
+  .page{display:none!important}
+  #page-planning{display:block!important}
+  .content{padding:8px!important;max-width:100%!important}
+  .card{box-shadow:none!important;border:1px solid #ccc!important;padding:10px!important}
+  /* Titre de semaine visible */
+  .week-header{background:#1A5276!important;color:#fff!important;border-radius:0!important;padding:8px 12px!important}
+  .week-header *{color:#fff!important}
+  /* Table planning */
+  #planning-tbl{font-size:11px!important}
+  #planning-tbl thead th{background:#1A5276!important;color:#fff!important;padding:6px 4px!important;border:1px solid #0d3a5c!important}
+  #planning-tbl thead th:first-child{background:#0d3a5c!important}
+  #planning-tbl tbody td{padding:3px!important;border:1px solid #ddd!important}
+  #planning-tbl button{border:1px solid #ccc!important;border-radius:4px!important;font-size:10px!important;min-height:44px!important;width:100%!important;cursor:default!important}
+  /* Note */
+  #note-jour{border:none!important;background:transparent!important;font-style:italic}
+  .pdf-bulletin{page-break-after:always}
+}
+@media(max-width:700px){
+  .metrics,.cp-grid,.hist-grid{grid-template-columns:repeat(2,1fr)}
+  .params-grid{grid-template-columns:1fr}
+  .content{padding:10px}
+  .tabs{padding:0 4px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div style="width:40px;height:40px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px">🎾</div>
+  <div>
+    <h1>Gestion Padel</h1>
+    <p id="header-sub">Planning & payes</p>
+  </div>
+  <div class="header-right"><span id="autosave-status" style="font-size:11px;color:#1ABC9C;opacity:0;transition:opacity 1s;font-weight:600">✓ Sauvegardé</span>
+    <select id="month-sel" onchange="updateMonth()">
+      <option>Janvier</option><option>Février</option><option>Mars</option>
+      <option selected>Avril</option>
+      <option>Mai</option><option>Juin</option><option>Juillet</option><option>Août</option>
+      <option>Septembre</option><option>Octobre</option><option>Novembre</option><option>Décembre</option>
+    </select>
+    <select id="year-sel" onchange="updateMonth()">
+      <option>2023</option><option>2024</option><option>2025</option><option selected>2026</option><option>2027</option>
+    </select>
+    <button class="hbtn" onclick="saveData()">💾 Exporter JSON</button>
+    <button class="hbtn" onclick="loadData()">📂 Charger</button>
+    <button class="hbtn" onclick="exportPlanningPDF()">📅 Planning PDF</button>
+    <button class="hbtn" onclick="envoyerPlanningMail()">📧 Envoyer planning</button>
+    <button class="hbtn" onclick="exportPDF()">📄 Bulletins PDF</button>
+    <button class="hbtn" onclick="imprimerPlanning()">🖨️ Imprimer planning</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showPage('planning',this)">📅 Planning</div>
+  <div class="tab" onclick="showPage('payes',this)">💰 Payes</div>
+  <div class="tab" onclick="showPage('conges',this)">🏖️ Congés</div>
+  <div class="tab" onclick="showPage('historique',this)">📈 Historique</div>
+  <div class="tab" onclick="showPage('recap',this)">📊 Récap</div>
+  <div class="tab" onclick="showPage('stats',this)">📉 Stats</div>
+</div>
+
+<div class="content">
+
+<!-- PLANNING -->
+<div class="page active" id="page-planning">
+  <div class="sem-tabs" id="sem-tabs"></div>
+  <div class="card">
+    <div class="week-header">📅 <span id="week-title"></span> <span style="font-size:11px;color:#5d8db5;font-weight:400" id="week-dates"></span></div>
+    <div class="legend no-print">
+      <span class="legend-item"><span class="legend-dot" style="background:#fff3cd;border:1px solid #f0ad4e"></span> CP</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#f8d7da;border:1px solid #dc3545"></span> Maladie</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#d1ecf1;border:1px solid #17a2b8"></span> Férié</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#ffe0e0;border:1px solid #dc3545"></span> Heures supp.</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#fff3cd;border:1px solid #ffc107"></span> Sous contrat</span>
+      <span style="color:#999;font-style:italic">Tapez CP, MAL, FER ou un horaire (ex: 9h-17h)</span>
+    </div>
+    <div style="overflow-x:auto"><table id="planning-tbl"></table></div>
+    <div style="margin-top:10px">
+      <label style="font-size:12px;font-weight:600;color:#888">📝 Note du jour :</label>
+      <input class="note-input" type="text" id="note-jour" placeholder="ex: tournoi, fermeture exceptionnelle..." oninput="saveNote()" style="width:100%;margin-top:4px">
+    </div>
+  </div>
+  <div class="metrics" id="planning-metrics"></div>
+</div>
+
+<!-- PAYES -->
+<div class="page" id="page-payes">
+  <div class="card">
+    <div class="card-title">⚙️ Paramètres de calcul</div>
+    <div class="params-grid">
+      <div class="param-item"><label>Cotisations salariales</label><div class="param-row"><input type="number" id="csal" value="23" min="0" max="60" oninput="calcPayes()"><span style="color:#888;font-weight:600">%</span></div></div>
+      <div class="param-item"><label>Cotisations patronales</label><div class="param-row"><input type="number" id="cpat" value="45" min="0" max="80" oninput="calcPayes()"><span style="color:#888;font-weight:600">%</span></div></div>
+      <div class="param-item"><label>Majoration heures sup.</label><div class="param-row"><input type="number" id="msup" value="25" min="0" max="100" oninput="calcPayes()"><span style="color:#888;font-weight:600">%</span></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">💼 Fiche de paie — <span id="payes-month-label"></span></div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr>
+          <th>Employé</th><th>Contrat</th><th>Taux/h (€)</th>
+          <th>H. travaillées</th><th>H. supp.</th><th>Absences</th>
+          <th>Salaire brut</th><th>Cotis. sal.</th><th>Salaire net</th>
+          <th>Primes (€)</th><th>Net à payer</th><th>Coût employeur</th>
+        </tr></thead>
+        <tbody id="payes-body"></tbody>
+        <tfoot id="payes-foot"></tfoot>
+      </table>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:10px;justify-content:flex-end" class="no-print">
+      <button class="hbtn" style="background:#1A5276;border-color:#1A5276" onclick="archiveMois()">💾 Archiver ce mois</button>
+      <button class="hbtn" style="background:#1e8449;border-color:#1e8449" onclick="exportPDF()">📄 Générer bulletins PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONGÉS -->
+<div class="page" id="page-conges">
+  <div class="card">
+    <div class="card-title">🏖️ Compteur de congés payés</div>
+    <div class="cp-grid" id="cp-grid"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📋 Détail des absences par employé</div>
+    <table>
+      <thead><tr><th>Employé</th><th>CP pris</th><th>CP restants</th><th>Jours maladie</th><th>Jours fériés</th><th>CP acquis/an</th></tr></thead>
+      <tbody id="abs-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- HISTORIQUE -->
+<div class="page" id="page-historique">
+  <div class="card">
+    <div class="card-title">📈 Historique des mois archivés</div>
+    <div id="hist-grid" class="hist-grid"></div>
+    <div id="hist-detail"></div>
+  </div>
+</div>
+
+<!-- RECAP -->
+<div class="page" id="page-recap">
+  <div class="metrics" id="recap-metrics"></div>
+  <div class="card">
+    <div class="card-title">📋 Détail par employé</div>
+    <table>
+      <thead><tr><th>Employé</th><th>Contrat</th><th>H. totales</th><th>Écart</th><th>Brut</th><th>Net à payer</th><th>Coût employeur</th></tr></thead>
+      <tbody id="recap-body"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <div class="card-title">📆 Récap semaine par semaine</div>
+    <table><thead><tr id="recap-sem-head"></tr></thead><tbody id="recap-sem-body"></tbody></table>
+  </div>
+</div>
+
+<!-- BULLETINS PDF (hidden, shown on print) -->
+<div id="pdf-bulletins" style="display:none"></div>
+
+
+
+<!-- STATS -->
+<div class="page" id="page-stats">
+  <div class="metrics" id="stats-metrics"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div class="card">
+      <div class="card-title">📊 Heures par employé (mois)</div>
+      <div id="chart-heures" style="padding:8px 0"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">💰 Coût salarial par employé</div>
+      <div id="chart-couts" style="padding:8px 0"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">📅 Présence semaine par semaine</div>
+    <div id="chart-presences" style="padding:8px 0"></div>
+  </div>
+</div>
+
+<!-- TIME PICKER MODAL -->
+<div class="modal-overlay" id="time-modal" style="display:none" onclick="if(event.target===this)closeTimePicker()">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="modal-emp-label">Choisir les horaires</span>
+      <span class="modal-close" onclick="closeTimePicker()">✕</span>
+    </div>
+    <div class="abs-btns">
+      <button class="abs-btn" style="border-color:#f0ad4e;color:#856404" id="btn-cp" onclick="selectAbs('CP')">🏖️ CP</button>
+      <button class="abs-btn" style="border-color:#dc3545;color:#721c24" id="btn-mal" onclick="selectAbs('MAL')">🤒 Maladie</button>
+      <button class="abs-btn" style="border-color:#17a2b8;color:#0c5460" id="btn-fer" onclick="selectAbs('FER')">🎌 Férié</button>
+      <button class="abs-btn" style="border-color:#aaa;color:#555" id="btn-repos" onclick="selectAbs('')">😴 Repos</button>
+    </div>
+    <div style="font-size:11px;color:#888;margin-bottom:6px">Horaires rapides :</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+      <button class="quick-slot" onclick="applyQuickSlotDirect('7h30-14h30')">7h30–14h30</button>
+      <button class="quick-slot" onclick="applyQuickSlotDirect('14h00-19h00')">14h00–19h00</button>
+      <button class="quick-slot" onclick="applyQuickSlotDirect('12h00-18h00')">12h–18h</button>
+      <button class="quick-slot" onclick="applyQuickSlotDirect('17h30-22h30')">17h30–22h30</button>
+      <button class="quick-slot" onclick="applyQuickSlotDirect('8h00-14h30')">8h00–14h30</button>
+      <button class="quick-slot" onclick="applyQuickSlotDirect('14h30-22h30')">14h30–22h30</button>
+      <button class="quick-slot" onclick="applyQuickSlotDirect('8h30-15h30')">8h30–15h30</button>
+      <button class="quick-slot" onclick="applyQuickSlotDirect('16h00-19h00')">16h–19h</button>
+    </div>
+    <div style="font-size:11px;color:#888;margin-bottom:8px">Ou choisissez manuellement :</div>
+    <div class="time-grid" id="time-grid"></div>
+    <div class="modal-result" id="modal-result">Sélectionnez une heure de début</div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-clear" onclick="clearSlot()">🗑️ Effacer</button>
+      <button class="modal-btn modal-btn-cancel" onclick="closeTimePicker()">Annuler</button>
+      <button class="modal-btn modal-btn-ok" onclick="confirmTimePicker()">✅ Confirmer</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- end content -->
+
+<input type="file" id="file-input" accept=".json" style="display:none" onchange="handleFileLoad(event)">
+
+<script>
+const employes=[
+  {nom:"Thierry",  taux:16.0,  hContract:35, bg:"#d6eaf8",txt:"#1a5276", contrat:"freelance"},
+  {nom:"Noélie",  taux:13.5,  hContract:35, bg:"#d5f5e3",txt:"#1e8449", contrat:"cdi"},
+  {nom:"Jolan",   taux:13.5,  hContract:35, bg:"#f4ecf7",txt:"#6c3483", contrat:"cdi"},
+  {nom:"Florence",taux:11.88, hContract:20, bg:"#fdebd0",txt:"#b7770d", contrat:"cdi"},
+  {nom:"Arthur",  taux:11.88, hContract:20, bg:"#fadbd8",txt:"#922b21", contrat:"cdi"},
+];
+const joursShort=["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
+const H_NORM_MENSUEL=151.67;
+let curSem=0; // index dans les semaines du mois courant
+// planning[ei][semKey][di] semKey = "YYYY-WNN"
+const planning=employes.map(()=>({}));
+// notes[semKey] = note de la semaine
+const notes={};
+const primes=employes.map(()=>0);
+const tauxEdit=employes.map(e=>e.taux);
+const hContractEdit=employes.map(e=>e.hContract);
+const contratEdit=employes.map(e=>e.contrat);
+// CP acquis par défaut (jours)
+const cpAcquis=employes.map(()=>25);
+let historique=[];
+
+// ── UTILITAIRES ────────────────────────────────────────────
+function getISOWeek(date){
+  // UTC-safe ISO week calculation
+  const d=new Date(Date.UTC(date.getUTCFullYear(),date.getUTCMonth(),date.getUTCDate()));
+  const day=d.getUTCDay()||7; // 1=Lun..7=Dim
+  d.setUTCDate(d.getUTCDate()+4-day);
+  const yearStart=new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d-yearStart)/86400000)+1)/7);
+}
+function getSemKey(year,numISO){return year+"-W"+(numISO<10?"0":"")+numISO;}
+
+// ── JOURS FÉRIÉS ───────────────────────────────────────────
+function getEaster(y){
+  const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4;
+  const f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3);
+  const h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4;
+  const l=(32+2*e+2*i-h-k)%7,mm=Math.floor((a+11*h+22*l)/451);
+  const month=(h+l-7*mm+114)>>5, day=((h+l-7*mm+114)%31)+1;
+  return new Date(Date.UTC(y,month-1,day));
+}
+function getFeries(y){
+  const e=getEaster(y);
+  const add=(d,n)=>{const t=new Date(e.getTime()+n*86400000);return[dateKey(t),d];};
+  const fixed=(mo,da,d)=>[`${y}-${String(mo).padStart(2,"0")}-${String(da).padStart(2,"0")}`,d];
+  return Object.fromEntries([
+    fixed(1,1,"Jour de l'An"), add("Lundi de Pâques",1),
+    fixed(5,1,"Fête du Travail"), fixed(5,8,"Victoire 1945"),
+    add("Ascension",39), add("Lundi de Pentecôte",50),
+    fixed(7,14,"Fête Nationale"), fixed(8,15,"Assomption"),
+    fixed(11,1,"Toussaint"), fixed(11,11,"Armistice"), fixed(12,25,"Noël"),
+  ]);
+}
+function dateKey(d){return d.getUTCFullYear()+"-"+String(d.getUTCMonth()+1).padStart(2,"0")+"-"+String(d.getUTCDate()).padStart(2,"0");}
+// Cache fériés par année
+const feriesCache={};
+function isFerie(date){
+  const y=date.getUTCFullYear();
+  if(!feriesCache[y])feriesCache[y]=getFeries(y);
+  return feriesCache[y][dateKey(date)]||null;
+}
+
+function getSemaines(){
+  const m=document.getElementById("month-sel").selectedIndex; // 0-based
+  const y=parseInt(document.getElementById("year-sel").value);
+  // Tout en UTC pour éviter les décalages de fuseau horaire
+  const fmtD=ts=>{const d=new Date(ts);return String(d.getUTCDate()).padStart(2,"0")+"/"+String(d.getUTCMonth()+1).padStart(2,"0");}
+  const sems=[];
+  // Premier jour du mois en UTC
+  const firstTs=Date.UTC(y,m,1);
+  const firstDow=new Date(firstTs).getUTCDay(); // 0=Dim,1=Lun...6=Sam
+  // Reculer jusqu'au lundi (isoWeekday: 1=Lun, en UTC)
+  const mondayOffset=firstDow===0?6:firstDow-1; // jours à reculer
+  const monday0Ts=firstTs-mondayOffset*86400000;
+  let idx=0;
+  let monTs=monday0Ts;
+  while(true){
+    const monDate=new Date(monTs);
+    const sunTs=monTs+6*86400000;
+    const sunDate=new Date(sunTs);
+    // Sortir si le lundi dépasse le mois
+    if(monDate.getUTCFullYear()>y||(monDate.getUTCFullYear()===y&&monDate.getUTCMonth()>m))break;
+    // Sauter si la semaine finit avant le mois
+    if(sunDate.getUTCFullYear()<y||(sunDate.getUTCFullYear()===y&&sunDate.getUTCMonth()<m)){monTs+=7*86400000;continue;}
+    const numISO=getISOWeek(monDate);
+    const isoYear=(monDate.getUTCMonth()===11&&numISO===1)?y+1:(monDate.getUTCMonth()===0&&numISO>=52?y-1:y);
+    const key=getSemKey(isoYear,numISO);
+    employes.forEach((_,ei)=>{if(!planning[ei][key])planning[ei][key]=Array(7).fill("");});
+    if(!notes[key])notes[key]="";
+    const joursAvecDates=Array.from({length:7},(_,d)=>{
+      const jTs=monTs+d*86400000;
+      const jDate=new Date(jTs);
+      const ferieNom=isFerie(jDate);
+      const dow=jDate.getUTCDay(); // 0=Dim,1=Lun...6=Sam
+      const isWE=dow===0||dow===6;
+      return{
+        court:joursShort[d],
+        date:fmtD(jTs),
+        fullDate:jDate,
+        isWE,
+        ferie:ferieNom,
+        dateKey:dateKey(jDate)
+      };
+    });
+    sems.push({label:"Sem. "+(idx+1),numISO,key,
+      monday:monDate,sunday:sunDate,
+      range:fmtD(monTs)+" → "+fmtD(sunTs),
+      joursAvecDates});
+    monTs+=7*86400000;idx++;
+  }
+  return sems;
+}
+
+function hToStr(h){
+  const hI=Math.floor(h),m=Math.round((h-hI)*60);
+  return m===0?`${hI}h00`:`${hI}h${m.toString().padStart(2,"0")}`;
+}
+function fmt(n){return n.toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2})+" €"}
+function av(n){return n.slice(0,2).toUpperCase()}
+
+function parseHeures(v){
+  v=(v||"").trim().replace(/\s/g,"");
+  if(!v||v==="CP"||v==="MAL"||v==="FER"||v.toUpperCase()==="REPOS")return 0;
+  const m=/^(\d{1,2})[h:.]?(\d{0,2})[-–](\d{1,2})[h:.]?(\d{0,2})$/.exec(v);
+  if(m){
+    const hD=parseInt(m[1])+(parseInt(m[2]||0)/60);
+    const hF=parseInt(m[3])+(parseInt(m[4]||0)/60);
+    let diff=hF-hD;if(diff<0)diff+=24;
+    return Math.round(diff*100)/100;
+  }
+  const hm=/^(\d{1,2})h(\d{2})$/.exec(v);
+  if(hm)return parseInt(hm[1])+(parseInt(hm[2])/60);
+  const n=parseFloat(v.replace(",","."));
+  return isNaN(n)?0:n;
+}
+
+function getAbsType(v){
+  const u=(v||"").trim().toUpperCase();
+  if(u==="CP")return"cp";
+  if(u==="MAL")return"mal";
+  if(u==="FER")return"fer";
+  if(u==="REPOS")return"repos";
+  return null;
+}
+
+function getSemH(ei,key){
+  const row=planning[ei][key];
+  if(!row)return 0;
+  let s=0;row.forEach(v=>{s+=parseHeures(v);});return s;
+}
+function getAllHMois(ei){
+  // sum only weeks of current month
+  const sems=getSemaines();
+  let s=0;sems.forEach(sem=>{s+=getSemH(ei,sem.key);});return s;
+}
+function getAbsCounts(ei){
+  let cp=0,mal=0,fer=0;
+  Object.keys(planning[ei]).forEach(k=>{
+    (planning[ei][k]||[]).forEach(v=>{
+      const t=getAbsType(v);
+      if(t==="cp")cp++;else if(t==="mal")mal++;else if(t==="fer")fer++;
+    });
+  });
+  return{cp,mal,fer};
+}
+function getAbsCountsMois(ei){
+  const sems=getSemaines();
+  let cp=0,mal=0,fer=0;
+  sems.forEach(sem=>{
+    (planning[ei][sem.key]||[]).forEach(v=>{
+      const t=getAbsType(v);
+      if(t==="cp")cp++;else if(t==="mal")mal++;else if(t==="fer")fer++;
+    });
+  });
+  return{cp,mal,fer};
+}
+
+// ── PLANNING ───────────────────────────────────────────────
+function updateMonth(){
+  const sems=getSemaines();
+  const m=document.getElementById("month-sel").value;
+  const y=document.getElementById("year-sel").value;
+  document.getElementById("header-sub").textContent=m+" "+y;
+  buildSemTabs(sems);buildPlanning(sems);
+}
+
+function buildSemTabs(sems){
+  document.getElementById("sem-tabs").innerHTML=sems.map((s,i)=>{
+    const nFer=s.joursAvecDates.filter(j=>j.ferie).length;
+    const ferBadge=nFer?`<span style="font-size:9px;background:#d1ecf1;color:#0c5460;border-radius:8px;padding:1px 5px;margin-left:4px">🎌${nFer}</span>`:"";
+    return `<button class="sem-btn${i===curSem?" active":""}" onclick="showSem(${i})">
+      ${s.label}${ferBadge}<span class="sem-num">S${s.numISO} · ${s.range}</span>
+    </button>`;
+  }).join("");
+}
+
+function showSem(i){
+  curSem=i;const sems=getSemaines();
+  buildSemTabs(sems);buildPlanning(sems);
+}
+
+function buildPlanning(sems){
+  if(!sems)sems=getSemaines();
+  const s=sems[curSem];
+  document.getElementById("week-title").textContent=s.label+" — S"+s.numISO;
+  document.getElementById("week-dates").textContent="("+s.range+")";
+  const semKey=s.key;
+  document.getElementById("note-jour").value=notes[semKey]||"";
+
+  let h=`<thead><tr><th>Employé</th>`;
+  s.joursAvecDates.forEach(j=>{
+    const isWE=j.isWE;
+    const isFer=!!j.ferie;
+    const bgTh=isFer?"#d1ecf1":isWE?"#f5f0fa":"#f7f9fc";
+    const colorTh=isFer?"#0c5460":isWE?"#6c3483":"#555";
+    const ferLabel=j.ferie?`<div style="font-size:8px;font-weight:700;color:#0c5460;margin-top:2px;white-space:nowrap;overflow:hidden;max-width:92px;text-overflow:ellipsis" title="${j.ferie}">🎌 ${j.ferie}</div>`:"";
+    h+=`<th style="background:${bgTh};color:${colorTh};min-width:100px">${j.court}<br><span style="font-size:9px;font-weight:400">${j.date}</span>${ferLabel}</th>`;
+  });
+  h+=`<th style="min-width:70px">Total</th></tr></thead><tbody>`;
+
+  employes.forEach((emp,ei)=>{
+    const hCont=hContractEdit[ei];
+    const hContMens=hCont*4.33;
+    h+=`<tr>`;
+    h+=`<td><div class="emp-cell"><div class="avatar" style="background:${emp.bg};color:${emp.txt}">${av(emp.nom)}</div><strong>${emp.nom}</strong></div></td>`;
+
+    for(let d=0;d<7;d++){
+      const jourInfo=s.joursAvecDates[d];
+      const isWE=jourInfo.isWE;
+      const ferieNom=jourInfo.ferie;
+      let v=(planning[ei][semKey]||[])[d]||"";
+      // Auto-suggest férié si case vide et jour férié
+      const absType=getAbsType(v);
+      const parsed=parseHeures(v);
+      let btnLabel, btnBg2, btnColor2, btnBorder2;
+      // Style weekend background
+
+      if(absType==="cp"){
+        btnLabel="<div style='font-size:13px'>🏖️</div><div>CP</div>";
+        btnBg2="#fff3cd";btnColor2="#856404";btnBorder2="#f0ad4e";
+      } else if(absType==="mal"){
+        btnLabel="<div style='font-size:13px'>🤒</div><div>Maladie</div>";
+        btnBg2="#f8d7da";btnColor2="#721c24";btnBorder2="#dc3545";
+      } else if(absType==="fer"){
+        btnLabel="<div style='font-size:13px'>🎌</div><div>Férié</div>";
+        btnBg2="#d1ecf1";btnColor2="#0c5460";btnBorder2="#17a2b8";
+      } else if(!v){
+        if(ferieNom){
+          btnLabel="<div style='font-size:11px'>🎌</div><div style='font-size:9px;max-width:85px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap' title='"+ferieNom+"'>"+ferieNom+"</div>";
+          btnBg2="#e8f8f0";btnColor2="#0c5460";btnBorder2="#17a2b8";
+        } else if(isWE){
+          btnLabel="<div style='font-size:13px;color:#9b8fc0'>+</div>";
+          btnBg2="#f5f0fa";btnColor2="#9b8fc0";btnBorder2="#d8ccee";
+        } else {
+          btnLabel="<div style='font-size:16px;color:#ddd'>+</div>";
+          btnBg2="#fafafa";btnColor2="#bbb";btnBorder2="#e0e0e0";
+        }
+      } else if(absType==="repos"){
+        btnLabel="<div style='font-size:12px'>😴</div><div>Repos</div>";
+        btnBg2="#f0f0f0";btnColor2="#777";btnBorder2="#ccc";
+      } else {
+        const p=v.split("-");
+        btnLabel="<div style='font-size:10px;opacity:.85'>"+(p[0]||"").trim()+"</div>"
+               +"<div style='font-size:10px;opacity:.85'>"+(p[1]||"").trim()+"</div>"
+               +"<div style='font-size:11px;font-weight:800;margin-top:1px'>"+hToStr(parsed)+"</div>";
+        btnBg2="#e8f4fd";btnColor2="#1A5276";btnBorder2="#1ABC9C";
+      }
+      h+=`<td style="${isWE&&!v?'background:#faf5ff':''};text-align:center"><button onclick="openTimePicker(${ei},'${semKey}',${d})" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" style="width:92px;min-height:52px;border:1.5px solid ${btnBorder2};border-radius:8px;background:${btnBg2};color:${btnColor2};font-size:11px;font-weight:700;cursor:pointer;padding:4px 2px;line-height:1.4">${btnLabel}</button></td>`;
+    }
+
+    const hTotSem=getSemH(ei,semKey);
+    const hContSem=hCont*7/5;// approx hebdo
+    const hContMensTot=hCont*4.33;
+    const hAllMois=getAllHMois(ei);
+    let totClass="";
+    if(hAllMois>hContMensTot+1)totClass="over";
+    else if(hAllMois<hContMensTot-1)totClass="under";
+    h+=`<td><div class="total-h${totClass?" "+totClass:""}" id="tot-${ei}">${hToStr(hTotSem)}</div></td>`;
+    h+=`</tr>`;
+  });
+  // Add employee row
+  h+=`<tr id="add-emp-row" style="background:#f9f9f9">
+    <td colspan="2" style="padding:6px 10px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="text" id="new-emp-nom" placeholder="Prénom employé..." style="width:140px;font-size:12px">
+        <input type="number" id="new-emp-taux" placeholder="Taux €/h" min="0" step="0.5" style="width:80px;font-size:12px">
+
+        <select id="new-emp-contrat" style="font-size:12px">
+          <option value="cdi">CDI</option>
+          <option value="freelance">Freelance</option>
+        </select>
+        <button onclick="addEmploye()" style="padding:5px 14px;background:#1A5276;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700">+ Ajouter</button>
+      </div>
+    </td>
+    <td colspan="9" style="font-size:11px;color:#aaa;font-style:italic;padding:6px 10px">Remplissez les champs et cliquez sur Ajouter pour créer un nouvel employé.</td>
+  </tr>`;
+  h+=`</tbody>`;
+  document.getElementById("planning-tbl").innerHTML=h;
+  buildPlanMetrics();
+}
+
+function styleInput(inp){
+  const v=inp.value.trim().toUpperCase();
+  inp.className="planning-input";
+  if(v==="CP")inp.classList.add("abs-cp");
+  else if(v==="MAL")inp.classList.add("abs-mal");
+  else if(v==="FER")inp.classList.add("abs-fer");
+  const h=parseHeures(inp.value);
+  inp.nextElementSibling.textContent=(inp.value&&h>0&&!getAbsType(inp.value)&&inp.value.includes("-"))?hToStr(h):"";
+}
+
+function refreshTot(ei){
+  const el=document.getElementById("tot-"+ei);
+  if(!el)return;
+  const sems=getSemaines();const semKey=sems[curSem]?sems[curSem].key:null;if(!semKey)return;
+  const hTotSem=getSemH(ei,semKey);
+  const hContMens=hContractEdit[ei]*4.33;
+  const hAllMois=getAllHMois(ei);
+  let cls="";
+  if(hAllMois>hContMens+1)cls="over";
+  else if(hAllMois<hContMens-1)cls="under";
+  el.className="total-h"+(cls?" "+cls:"");
+  el.textContent=hToStr(hTotSem);
+  buildPlanMetrics();
+}
+
+function saveNote(){const sems=getSemaines();if(sems[curSem])notes[sems[curSem].key]=document.getElementById("note-jour").value;autoSave();}
+
+function buildPlanMetrics(){
+  const _sems=getSemaines();const _sk=_sems[curSem]?_sems[curSem].key:null;
+  const totals=employes.map((_,ei)=>_sk?getSemH(ei,_sk):0);
+  const total=totals.reduce((a,b)=>a+b,0);
+  let html=`<div class="metric"><div class="metric-label">Total équipe semaine</div><div class="metric-val">${hToStr(total)}</div></div>`;
+  employes.forEach((emp,ei)=>{
+    const h=totals[ei];
+    const hContMens=hContractEdit[ei]*4.33;
+    const hAllMois=getAllHMois(ei);
+    let col=emp.txt;
+    if(hAllMois>hContMens+1)col="#dc3545";
+    else if(hAllMois<hContMens-1)col="#856404";
+    html+=`<div class="metric" style="background:${emp.bg}"><div class="metric-label" style="color:${emp.txt}">${emp.nom}</div><div class="metric-val" style="color:${col};font-size:20px">${hToStr(h)}</div></div>`;
+  });
+  document.getElementById("planning-metrics").innerHTML=html;
+}
+
+// ── PAYES ──────────────────────────────────────────────────
+function calcPayes(){
+  const csal=(parseFloat(document.getElementById("csal").value)||23)/100;
+  const cpat=(parseFloat(document.getElementById("cpat").value)||45)/100;
+  const msup=(parseFloat(document.getElementById("msup").value)||25)/100;
+  const m=document.getElementById("month-sel").value;
+  const y=document.getElementById("year-sel").value;
+  document.getElementById("payes-month-label").textContent=m+" "+y;
+  let tBrut=0,tNet=0,tCout=0;
+  let rows="";
+  employes.forEach((emp,ei)=>{
+    const hTot=getAllHMois(ei);
+    const hCont=hContractEdit[ei]*4.33;
+    const hN=Math.min(hTot,hCont);
+    const hS=Math.max(0,hTot-hCont);
+    const taux=tauxEdit[ei];
+    const brut=hTot>0?hN*taux+hS*taux*(1+msup):0;
+    const isFL=contratEdit[ei]==="freelance";
+    const cs=isFL?0:brut*csal;
+    const net=brut-cs;
+    const pr=primes[ei];
+    const netP=net+pr;
+    const cp2=isFL?0:brut*cpat;
+    const cout=brut+cp2+pr;
+    const abs=getAbsCountsMois(ei);
+    const ecart=hTot-hCont;
+    tBrut+=brut;tNet+=netP;tCout+=cout;
+    rows+=`<tr>
+      <td><div class="emp-cell"><div class="avatar" style="background:${emp.bg};color:${emp.txt}">${av(emp.nom)}</div><strong>${emp.nom}</strong></div></td>
+      <td><select style="font-size:11px;padding:3px 5px" onchange="contratEdit[${ei}]=this.value;calcPayes()">
+        <option value="cdi"${contratEdit[ei]==="cdi"?" selected":""}>CDI</option>
+        <option value="freelance"${contratEdit[ei]==="freelance"?" selected":""}>Freelance</option>
+      </select></td>
+      <td><div style="display:flex;align-items:center;gap:4px"><input type="number" value="${taux.toFixed(2)}" step="0.01" min="0" style="width:65px" oninput="tauxEdit[${ei}]=parseFloat(this.value)||0;calcPayes()"><span style="font-size:11px;color:#999">€</span></div></td>
+      <td style="text-align:center">${hToStr(hTot)}</td>
+      <td style="text-align:center">${hS>0?`<span class="badge badge-amber">${hToStr(hS)}</span>`:`<span style="color:#bbb">—</span>`}</td>
+      <td style="text-align:center">${abs.cp>0?`<span class="badge badge-cp">${abs.cp}j CP</span> `:""}${abs.mal>0?`<span class="badge badge-mal">${abs.mal}j 🤒</span>`:""}${abs.cp===0&&abs.mal===0?`<span style="color:#bbb">—</span>`:""}</td>
+      <td><strong>${fmt(brut)}</strong></td>
+      <td style="color:#c0392b">${isFL?`<span style="color:#888;font-style:italic">Freelance</span>`:`−${fmt(cs)}`}</td>
+      <td style="color:#1e8449"><strong>${fmt(net)}</strong></td>
+      <td><input type="number" value="${pr}" step="10" min="0" style="width:65px" oninput="primes[${ei}]=parseFloat(this.value)||0;calcPayes()"></td>
+      <td><span class="badge badge-green">${fmt(netP)}</span></td>
+      <td><span class="badge badge-amber">${fmt(cout)}</span></td>
+    </tr>`;
+  });
+  document.getElementById("payes-body").innerHTML=rows;
+  document.getElementById("payes-foot").innerHTML=`<tr>
+    <td colspan="7">TOTAL</td>
+    <td>${fmt(tBrut)}</td><td>—</td><td>—</td><td>—</td>
+    <td>${fmt(tNet)}</td><td><span class="badge badge-red">${fmt(tCout)}</span></td>
+  </tr>`;
+}
+
+// ── CONGÉS ─────────────────────────────────────────────────
+function buildConges(){
+  const cpGrid=document.getElementById("cp-grid");
+  const absBody=document.getElementById("abs-body");
+  let gridHtml="",bodyHtml="";
+  employes.forEach((emp,ei)=>{
+    const abs=getAbsCounts(ei);
+    const acquis=cpAcquis[ei];
+    const restants=Math.max(0,acquis-abs.cp);
+    const pct=Math.round((abs.cp/acquis)*100);
+    gridHtml+=`<div class="cp-card">
+      <div class="cp-name" style="color:${emp.txt}">${emp.nom}</div>
+      <div class="cp-bar-wrap"><div class="cp-bar" style="width:${pct}%;background:${emp.txt}"></div></div>
+      <div class="cp-nums"><span>${abs.cp}j pris</span><span>${restants}j restants</span></div>
+      <div style="font-size:10px;color:#aaa;margin-top:4px">Sur ${acquis}j acquis</div>
+      <div style="margin-top:6px;display:flex;align-items:center;gap:4px;font-size:11px">
+        <span style="color:#888">Acquis:</span>
+        <input type="number" value="${acquis}" min="0" max="50" style="width:50px;text-align:center;font-size:11px" oninput="cpAcquis[${ei}]=parseInt(this.value)||0;buildConges()">j
+      </div>
+    </div>`;
+    bodyHtml+=`<tr>
+      <td><div class="emp-cell"><div class="avatar" style="background:${emp.bg};color:${emp.txt}">${av(emp.nom)}</div>${emp.nom}</div></td>
+      <td><span class="badge badge-cp">${abs.cp}j</span></td>
+      <td><span class="badge badge-green">${Math.max(0,cpAcquis[ei]-abs.cp)}j</span></td>
+      <td>${abs.mal>0?`<span class="badge badge-mal">${abs.mal}j</span>`:`<span style="color:#bbb">0j</span>`}</td>
+      <td>${abs.fer>0?`<span class="badge badge-blue">${abs.fer}j</span>`:`<span style="color:#bbb">0j</span>`}</td>
+      <td>${cpAcquis[ei]}j</td>
+    </tr>`;
+  });
+  cpGrid.innerHTML=gridHtml;
+  absBody.innerHTML=bodyHtml;
+}
+
+// ── HISTORIQUE ─────────────────────────────────────────────
+function archiveMois(){
+  const m=document.getElementById("month-sel").value;
+  const y=document.getElementById("year-sel").value;
+  const csal=(parseFloat(document.getElementById("csal").value)||23)/100;
+  const cpat=(parseFloat(document.getElementById("cpat").value)||45)/100;
+  const msup=(parseFloat(document.getElementById("msup").value)||25)/100;
+  const snap=employes.map((emp,ei)=>{
+    const hTot=getAllHMois(ei);
+    const hCont=hContractEdit[ei]*4.33;
+    const hN=Math.min(hTot,hCont);
+    const hS=Math.max(0,hTot-hCont);
+    const brut=hTot>0?hN*tauxEdit[ei]+hS*tauxEdit[ei]*(1+msup):0;
+    const isFL=contratEdit[ei]==="freelance";
+    const net=(brut-(isFL?0:brut*csal))+primes[ei];
+    const cout=brut+(isFL?0:brut*cpat)+primes[ei];
+    const abs=getAbsCounts(ei);
+    return{nom:emp.nom,hTot,hCont,brut,net,cout,abs};
+  });
+  const total=snap.reduce((a,e)=>({brut:a.brut+e.brut,net:a.net+e.net,cout:a.cout+e.cout}),{brut:0,net:0,cout:0});
+  const key=m+" "+y;
+  const idx=historique.findIndex(h=>h.key===key);
+  if(idx>=0)historique[idx]={key,mois:m,annee:y,snap,total};
+  else historique.push({key,mois:m,annee:y,snap,total});
+  buildHistorique();
+  autoSave();
+  alert(`✅ Mois de ${m} ${y} archivé avec succès !`);
+}
+
+function buildHistorique(){
+  const el=document.getElementById("hist-grid");
+  if(historique.length===0){
+    el.innerHTML=`<div style="color:#aaa;font-style:italic;padding:20px">Aucun mois archivé. Allez dans Payes et cliquez sur "Archiver ce mois".</div>`;
+    document.getElementById("hist-detail").innerHTML="";
+    return;
+  }
+  el.innerHTML=historique.map((h,i)=>`
+    <div class="hist-card" onclick="showHistDetail(${i})">
+      <div class="hist-month">${h.key}</div>
+      <div class="hist-detail">Brut total : ${fmt(h.total.brut)}</div>
+      <div class="hist-detail">Net à payer : ${fmt(h.total.net)}</div>
+      <div class="hist-detail">Coût employeur : ${fmt(h.total.cout)}</div>
+    </div>`).join("");
+}
+
+function showHistDetail(i){
+  const h=historique[i];
+  document.querySelectorAll(".hist-card").forEach((c,j)=>c.classList.toggle("active-hist",j===i));
+  let rows=h.snap.map(e=>`<tr>
+    <td>${e.nom}</td>
+    <td>${hToStr(e.hTot)}</td>
+    <td>${fmt(e.brut)}</td>
+    <td style="color:#1e8449"><strong>${fmt(e.net)}</strong></td>
+    <td><span class="badge badge-amber">${fmt(e.cout)}</span></td>
+  </tr>`).join("");
+  document.getElementById("hist-detail").innerHTML=`
+    <div class="card" style="margin-top:10px">
+      <div class="card-title">Détail — ${h.key}</div>
+      <table>
+        <thead><tr><th>Employé</th><th>H. travaillées</th><th>Brut</th><th>Net à payer</th><th>Coût employeur</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+// ── RÉCAP ──────────────────────────────────────────────────
+function calcRecap(){
+  const sems=getSemaines();
+  const csal=(parseFloat(document.getElementById("csal").value)||23)/100;
+  const cpat=(parseFloat(document.getElementById("cpat").value)||45)/100;
+  const msup=(parseFloat(document.getElementById("msup").value)||25)/100;
+  let tH=0,tBrut=0,tNet=0,tCout=0;
+  let rows="",semRows="";
+  document.getElementById("recap-sem-head").innerHTML=`<th>Employé</th>`+
+    sems.map(s=>`<th style="text-align:center">S${s.numISO}<br><span style="font-size:9px;font-weight:400;color:#999">${s.range}</span></th>`).join("")+
+    `<th style="text-align:center">Total</th>`;
+  employes.forEach((emp,ei)=>{
+    const hTot=getAllHMois(ei);
+    const hCont=hContractEdit[ei]*4.33;
+    const hN=Math.min(hTot,hCont);
+    const hS=Math.max(0,hTot-hCont);
+    const brut=hTot>0?hN*tauxEdit[ei]+hS*tauxEdit[ei]*(1+msup):0;
+    const isFL=contratEdit[ei]==="freelance";
+    const net=(brut-(isFL?0:brut*csal))+primes[ei];
+    const cout=brut+(isFL?0:brut*cpat)+primes[ei];
+    const ecart=hTot-hCont;
+    tH+=hTot;tBrut+=brut;tNet+=net;tCout+=cout;
+    const ecartStr=ecart>=0?`<span style="color:#1e8449">+${hToStr(ecart)}</span>`:`<span style="color:#dc3545">${hToStr(Math.abs(ecart))}</span>`;
+    rows+=`<tr>
+      <td><div class="emp-cell"><div class="avatar" style="background:${emp.bg};color:${emp.txt}">${av(emp.nom)}</div><strong>${emp.nom}</strong></div></td>
+      <td><span class="badge${isFL?" badge-blue":" badge-green"}">${isFL?"Freelance":"CDI"}</span></td>
+      <td>${hToStr(hTot)}</td>
+      <td>${fmt(brut)}</td>
+      <td style="color:#1e8449"><strong>${fmt(net)}</strong></td>
+      <td><span class="badge badge-amber">${fmt(cout)}</span></td>
+    </tr>`;
+    const semH=sems.map(sem=>getSemH(ei,sem.key));
+    const semTot=semH.reduce((a,b)=>a+b,0);
+    semRows+=`<tr>
+      <td><div class="emp-cell"><div class="avatar" style="background:${emp.bg};color:${emp.txt}">${av(emp.nom)}</div>${emp.nom}</div></td>
+      ${semH.map(h=>`<td style="text-align:center">${h>0?`<strong>${hToStr(h)}</strong>`:`<span style="color:#bbb">—</span>`}</td>`).join("")}
+      <td style="text-align:center"><strong>${hToStr(semTot)}</strong></td>
+    </tr>`;
+  });
+  document.getElementById("recap-body").innerHTML=rows;
+  document.getElementById("recap-sem-body").innerHTML=semRows;
+  document.getElementById("recap-metrics").innerHTML=`
+    <div class="metric"><div class="metric-label">Heures totales</div><div class="metric-val">${hToStr(tH)}</div></div>
+    <div class="metric"><div class="metric-label">Masse salariale brute</div><div class="metric-val" style="font-size:18px">${fmt(tBrut)}</div></div>
+    <div class="metric"><div class="metric-label">Total net à payer</div><div class="metric-val" style="color:#1e8449;font-size:18px">${fmt(tNet)}</div></div>
+    <div class="metric"><div class="metric-label">Coût total employeur</div><div class="metric-val" style="color:#c0392b;font-size:18px">${fmt(tCout)}</div></div>`;
+}
+
+// ── BULLETINS PDF ──────────────────────────────────────────
+function exportPDF(){
+  const csal=(parseFloat(document.getElementById("csal").value)||23)/100;
+  const cpat=(parseFloat(document.getElementById("cpat").value)||45)/100;
+  const msup=(parseFloat(document.getElementById("msup").value)||25)/100;
+  const m=document.getElementById("month-sel").value;
+  const y=document.getElementById("year-sel").value;
+  let html="";
+  employes.forEach((emp,ei)=>{
+    const hTot=getAllHMois(ei);
+    const hCont=hContractEdit[ei]*4.33;
+    const hN=Math.min(hTot,hCont);
+    const hS=Math.max(0,hTot-hCont);
+    const brut=hTot>0?hN*tauxEdit[ei]+hS*tauxEdit[ei]*(1+msup):0;
+    const isFL=contratEdit[ei]==="freelance";
+    const cs=isFL?0:brut*csal;
+    const net=brut-cs;
+    const pr=primes[ei];
+    const netP=net+pr;
+    const cp2=isFL?0:brut*cpat;
+    const cout=brut+cp2+pr;
+    const abs=getAbsCounts(ei);
+    html+=`<div class="pdf-bulletin" style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto 40px;border:2px solid #1A5276;border-radius:10px;overflow:hidden">
+      <div style="background:#1A5276;color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:18px;font-weight:700">🎾 Padel — Bulletin de paie</div><div style="font-size:12px;opacity:.8">${m} ${y}</div></div>
+        <div style="text-align:right"><div style="font-size:16px;font-weight:700">${emp.nom}</div><div style="font-size:12px;opacity:.8">${contratEdit[ei].toUpperCase()}</div></div>
+      </div>
+      <div style="padding:20px">
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <tr style="background:#f7f9fc"><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600">Taux horaire</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:right">${tauxEdit[ei].toFixed(2)} €/h</td></tr>
+          <tr><td style="padding:8px;border-bottom:1px solid #eee">Heures contractuelles</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:right">${hToStr(hCont)}</td></tr>
+          <tr style="background:#f7f9fc"><td style="padding:8px;border-bottom:1px solid #eee">Heures travaillées</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:right">${hToStr(hTot)}</td></tr>
+          ${hS>0?`<tr><td style="padding:8px;border-bottom:1px solid #eee;color:#b7770d">Dont heures supplémentaires</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:right;color:#b7770d">${hToStr(hS)}</td></tr>`:""}
+          ${abs.cp>0?`<tr style="background:#fff3cd"><td style="padding:8px;border-bottom:1px solid #eee">Congés payés pris</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:right">${abs.cp} jour(s)</td></tr>`:""}
+          ${abs.mal>0?`<tr style="background:#f8d7da"><td style="padding:8px;border-bottom:1px solid #eee">Jours maladie</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:right">${abs.mal} jour(s)</td></tr>`:""}
+          <tr style="background:#e8f4fd"><td style="padding:10px 8px;border-bottom:2px solid #1A5276;font-weight:700">Salaire brut</td><td style="padding:10px 8px;border-bottom:2px solid #1A5276;text-align:right;font-weight:700">${fmt(brut)}</td></tr>
+          ${!isFL?`<tr><td style="padding:8px;border-bottom:1px solid #eee;color:#c0392b">− Cotisations salariales (${Math.round(csal*100)}%)</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:right;color:#c0392b">−${fmt(cs)}</td></tr>`:""}
+          <tr style="background:#f7f9fc"><td style="padding:8px;border-bottom:1px solid #eee">= Salaire net</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:right">${fmt(net)}</td></tr>
+          ${pr>0?`<tr><td style="padding:8px;border-bottom:1px solid #eee;color:#1e8449">+ Primes</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:right;color:#1e8449">+${fmt(pr)}</td></tr>`:""}
+          <tr style="background:#d5f5e3"><td style="padding:12px 8px;font-size:15px;font-weight:700;color:#1e8449">NET À PAYER</td><td style="padding:12px 8px;text-align:right;font-size:15px;font-weight:700;color:#1e8449">${fmt(netP)}</td></tr>
+        </table>
+        ${!isFL?`<div style="margin-top:12px;padding:10px;background:#fdebd0;border-radius:6px;font-size:11px;color:#784212"><strong>Info employeur :</strong> Cotisations patronales (${Math.round(cpat*100)}%) : ${fmt(cp2)} — Coût total employeur : ${fmt(cout)}</div>`:""}
+        <div style="margin-top:20px;display:flex;justify-content:space-between;font-size:12px;color:#888">
+          <div>Signature employé : ___________________________</div>
+          <div>Signature employeur : ___________________________</div>
+        </div>
+      </div>
+    </div>`;
+  });
+  const w=window.open("","_blank");
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bulletins de paie ${m} ${y}</title>
+    <style>body{font-family:Arial,sans-serif;background:#f0f2f5;padding:20px}
+    
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center}
+.modal{background:#fff;border-radius:14px;padding:24px;min-width:340px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.25)}
+.modal-title{font-size:15px;font-weight:700;color:#1A5276;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.modal-close{cursor:pointer;font-size:20px;color:#aaa;line-height:1}
+.modal-close:hover{color:#333}
+.time-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-height:320px;overflow-y:auto;margin-bottom:14px}
+.time-slot{padding:7px 4px;text-align:center;border:1.5px solid #e0e8f0;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:#1A5276;background:#f7fbff;transition:all .15s;user-select:none}
+.time-slot:hover{background:#1A5276;color:#fff;border-color:#1A5276}
+.time-slot.selected-start{background:#1ABC9C;color:#fff;border-color:#1ABC9C}
+.time-slot.selected-end{background:#1A5276;color:#fff;border-color:#1A5276}
+.time-slot.in-range{background:#e8f4fd;border-color:#1ABC9C;color:#1A5276}
+.time-slot.abs-slot{background:#fff3cd;color:#856404;border-color:#f0ad4e}
+.time-slot.abs-slot:hover{background:#f0ad4e;color:#fff}
+.modal-result{background:#f0fff8;border:1.5px solid #1ABC9C;border-radius:8px;padding:10px;text-align:center;font-weight:700;color:#1A5276;margin-bottom:12px;font-size:14px;min-height:40px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.modal-btn{padding:8px 18px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:700}
+.modal-btn-ok{background:#1A5276;color:#fff}
+.modal-btn-ok:hover{background:#148F77}
+.modal-btn-cancel{background:#eee;color:#555}
+.modal-btn-clear{background:#fadbd8;color:#922b21}
+.abs-btns{display:flex;gap:6px;margin-bottom:12px}
+.abs-btn{flex:1;padding:7px;border-radius:8px;border:2px solid;cursor:pointer;font-size:12px;font-weight:700;background:#fff;transition:all .15s}
+.abs-btn:hover{opacity:.8}
+.abs-btn.active{color:#fff}
+.quick-slot{padding:6px 10px;border:1.5px solid #1ABC9C;border-radius:8px;background:#f0fff8;color:#1A5276;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+.quick-slot:hover{background:#1ABC9C;color:#fff}
+
+@media print{body{background:#fff;padding:0}.pdf-bulletin{break-after:page}}</style>
+    </head><body><div style="text-align:center;margin-bottom:30px;no-print">
+    <button onclick="window.print()" style="padding:10px 24px;background:#1A5276;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700">🖨️ Imprimer / Enregistrer en PDF</button>
+    </div>${html}</body></html>`);
+  w.document.close();
+}
+
+// ── SAUVEGARDE ─────────────────────────────────────────────
+function getDataSnapshot(){
+  return{
+    v:3,
+    month:document.getElementById("month-sel").value,
+    year:document.getElementById("year-sel").value,
+    planning,notes,primes,tauxEdit,hContractEdit,contratEdit,cpAcquis,historique,
+    terrainStatuts,terrainTarifs,terrainNotes,
+    csal:document.getElementById("csal").value,
+    cpat:document.getElementById("cpat").value,
+    msup:document.getElementById("msup").value,
+  };
+}
+
+// ── SUPABASE REST API (sans SDK) ──────────────────────────
+const SUPA_URL="https://iotkbrdzorjuqlnmhipo.supabase.co";
+const SUPA_KEY="sb_publishable_uKhPjOg62j1iAzVuV1ENjQ_1HX2P2mz";
+
+function showStatus(msg,color){
+  const el=document.getElementById('autosave-status');
+  if(!el)return;
+  el.textContent=msg;el.style.color=color||'#1ABC9C';el.style.opacity='1';
+  setTimeout(()=>{el.style.opacity='0';},2500);
+}
+
+async function supaRead(){
+  const r=await fetch(`${SUPA_URL}/rest/v1/padel_data?id=eq.main&select=data`,{
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+  });
+  const rows=await r.json();
+  return rows&&rows.length?rows[0].data:null;
+}
+
+async function supaWrite(data){
+  await fetch(`${SUPA_URL}/rest/v1/padel_data?id=eq.main`,{
+    method:'PATCH',
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify({data,updated_at:new Date().toISOString()})
+  });
+}
+
+let saveTimer=null;
+function autoSave(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    try{
+      await supaWrite(getDataSnapshot());
+      showStatus('✓ Sauvegardé');
+    }catch(e){console.warn('AutoSave:',e);showStatus('⚠ Erreur','#e74c3c');}
+  },800);
+}
+
+function saveData(){
+  const data=getDataSnapshot();
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  const m=document.getElementById("month-sel").value;
+  const y=document.getElementById("year-sel").value;
+  a.download=`padel_${m}_${y}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function loadData(){document.getElementById("file-input").click();}
+
+function applyData(d){
+  if(d.planning){
+    if(Array.isArray(d.planning)){
+      d.planning.forEach((ep,ei)=>{if(planning[ei]&&Array.isArray(ep))ep.forEach((week,si)=>{const k="legacy-"+si;planning[ei][k]=week;});});
+    } else {
+      d.planning.forEach((ep,ei)=>{if(planning[ei]&&ep)Object.assign(planning[ei],ep);});
+    }
+  }
+  if(d.notes){
+    if(Array.isArray(d.notes))d.notes.forEach((n,i)=>{notes["legacy-"+i]=n;});
+    else Object.assign(notes,d.notes);
+  }
+  if(d.primes)d.primes.forEach((p,i)=>{primes[i]=p;});
+  if(d.tauxEdit)d.tauxEdit.forEach((t,i)=>{tauxEdit[i]=t;});
+  if(d.hContractEdit)d.hContractEdit.forEach((h,i)=>{hContractEdit[i]=h;});
+  if(d.contratEdit)d.contratEdit.forEach((c,i)=>{contratEdit[i]=c;});
+  if(d.cpAcquis)d.cpAcquis.forEach((c,i)=>{cpAcquis[i]=c;});
+  if(d.historique)historique=d.historique;
+  if(d.month){
+    const opts=document.getElementById("month-sel").options;
+    for(let i=0;i<opts.length;i++)if(opts[i].value===d.month||opts[i].text===d.month){document.getElementById("month-sel").selectedIndex=i;break;}
+  }
+  if(d.year){
+    const opts=document.getElementById("year-sel").options;
+    for(let i=0;i<opts.length;i++)if(opts[i].value===d.year||opts[i].text===d.year){document.getElementById("year-sel").selectedIndex=i;break;}
+  }
+  if(d.csal)document.getElementById("csal").value=d.csal;
+  if(d.cpat)document.getElementById("cpat").value=d.cpat;
+  if(d.msup)document.getElementById("msup").value=d.msup;
+  updateMonth();calcPayes();buildHistorique();
+}
+
+function handleFileLoad(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      applyData(d);
+      autoSave();
+      alert("✅ Données chargées avec succès !");
+    }catch(err){alert("❌ Erreur lors du chargement : "+err.message);}
+  };
+  reader.readAsText(file);
+  e.target.value="";
+}
+
+// ── NAVIGATION ─────────────────────────────────────────────
+function showPage(id,el){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("page-"+id).classList.add("active");
+  if(el)el.classList.add("active");
+  if(id==="payes")calcPayes();
+  if(id==="conges")buildConges();
+  if(id==="historique")buildHistorique();
+  if(id==="recap"){calcPayes();calcRecap();}
+  if(id==="stats"){calcPayes();buildStats();}
+}
+
+
+// ── TIME PICKER ────────────────────────────────────────────
+let pickerEi=-1,pickerSk=null,pickerDi=-1;
+let pickerStart=null,pickerEnd=null;
+
+const SLOTS=[];
+for(let h=6;h<=23;h++){SLOTS.push(`${h}h00`);SLOTS.push(`${h}h30`);}
+SLOTS.push("00h00");
+
+function openTimePicker(ei,sk,di){
+  pickerEi=ei;pickerSk=sk;pickerDi=di;
+  pickerStart=null;pickerEnd=null;
+  const v=(planning[ei][sk]||[])[di]||"";
+  const m=document.getElementById("time-modal");
+  const emp=employes[ei];
+  document.getElementById("modal-emp-label").textContent=`${emp.nom} — ${["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"][di]}`;
+  // Pre-fill if existing range
+  if(v&&v.includes("-")){
+    const parts=v.split("-");
+    pickerStart=parts[0].trim();
+    pickerEnd=parts[1].trim();
+  }
+  // Reset abs buttons
+  document.querySelectorAll(".abs-btn").forEach(b=>b.classList.remove("active"));
+  const abs=getAbsType(v);
+  if(abs==="cp")document.getElementById("btn-cp").classList.add("active");
+  else if(abs==="mal")document.getElementById("btn-mal").classList.add("active");
+  else if(abs==="fer")document.getElementById("btn-fer").classList.add("active");
+  renderTimeGrid();
+  updateModalResult();
+  m.style.display="flex";
+}
+
+function renderTimeGrid(){
+  const grid=document.getElementById("time-grid");
+  grid.innerHTML=SLOTS.map(s=>{
+    let cls="time-slot";
+    if(pickerStart&&pickerEnd){
+      const si=SLOTS.indexOf(pickerStart),ei=SLOTS.indexOf(pickerEnd);
+      const ci=SLOTS.indexOf(s);
+      if(s===pickerStart)cls+=" selected-start";
+      else if(s===pickerEnd)cls+=" selected-end";
+      else if(si>=0&&ei>=0&&ci>si&&ci<ei)cls+=" in-range";
+    } else if(s===pickerStart){
+      cls+=" selected-start";
+    }
+    return `<div class="${cls}" onclick="clickSlot('${s}')">${s}</div>`;
+  }).join("");
+}
+
+function clickSlot(s){
+  document.querySelectorAll(".abs-btn").forEach(b=>b.classList.remove("active"));
+  if(!pickerStart||pickerEnd){
+    pickerStart=s;pickerEnd=null;
+  } else {
+    const si=SLOTS.indexOf(pickerStart),ei=SLOTS.indexOf(s);
+    if(ei>si){pickerEnd=s;}
+    else{pickerStart=s;pickerEnd=null;}
+  }
+  renderTimeGrid();
+  updateModalResult();
+}
+
+function updateModalResult(){
+  const el=document.getElementById("modal-result");
+  if(pickerStart&&pickerEnd){
+    const hD=slotToH(pickerStart),hF=slotToH(pickerEnd);
+    let diff=hF-hD;if(diff<0)diff+=24;
+    const hI=Math.floor(diff),m=Math.round((diff-hI)*60);
+    const durStr=m===0?`${hI}h00`:`${hI}h${m.toString().padStart(2,"0")}`;
+    el.textContent=`${pickerStart} → ${pickerEnd}  =  ${durStr}`;
+    el.style.background="#f0fff8";el.style.borderColor="#1ABC9C";el.style.color="#1A5276";
+  } else if(pickerStart){
+    el.textContent=`Début : ${pickerStart} — Sélectionnez la fin`;
+    el.style.background="#f7f9fc";el.style.borderColor="#aaa";el.style.color="#555";
+  } else {
+    el.textContent="Sélectionnez une heure de début";
+    el.style.background="#f7f9fc";el.style.borderColor="#aaa";el.style.color="#aaa";
+  }
+}
+
+function slotToH(s){
+  const m=/^(\d{1,2})h(\d{2})$/.exec(s);
+  if(!m)return 0;
+  return parseInt(m[1])+(parseInt(m[2])/60);
+}
+
+function selectAbs(type){
+  document.querySelectorAll(".abs-btn").forEach(b=>b.classList.remove("active"));
+  pickerStart=null;pickerEnd=null;
+  const el=document.getElementById("modal-result");
+  if(type==="CP"){
+    document.getElementById("btn-cp").classList.add("active");
+    el.textContent="Congé payé";el.style.background="#fff3cd";el.style.borderColor="#f0ad4e";el.style.color="#856404";
+  }else if(type==="MAL"){
+    document.getElementById("btn-mal").classList.add("active");
+    el.textContent="Arrêt maladie";el.style.background="#f8d7da";el.style.borderColor="#dc3545";el.style.color="#721c24";
+  }else if(type==="FER"){
+    document.getElementById("btn-fer").classList.add("active");
+    el.textContent="Jour férié";el.style.background="#d1ecf1";el.style.borderColor="#17a2b8";el.style.color="#0c5460";
+  }else{
+    el.textContent="Jour de repos";el.style.background="#f7f9fc";el.style.borderColor="#aaa";el.style.color="#555";
+  }
+  renderTimeGrid();
+  // store abs type temporarily
+  pickerStart="__ABS__";pickerEnd=type||"REPOS";
+}
+
+function clearSlot(){
+  pickerStart=null;pickerEnd=null;
+  if(!planning[pickerEi][pickerSk])planning[pickerEi][pickerSk]=Array(7).fill("");
+  planning[pickerEi][pickerSk][pickerDi]="";
+  buildPlanning();
+  closeTimePicker();
+  autoSave();
+}
+
+function confirmTimePicker(){
+  if(!planning[pickerEi][pickerSk])planning[pickerEi][pickerSk]=Array(7).fill("");
+  if(pickerStart==="__ABS__"){
+    const v=pickerEnd==="REPOS"?"REPOS":pickerEnd;
+    planning[pickerEi][pickerSk][pickerDi]=v;
+  } else if(pickerStart&&pickerEnd){
+    planning[pickerEi][pickerSk][pickerDi]=pickerStart+"-"+pickerEnd;
+  } else if(pickerStart){
+    planning[pickerEi][pickerSk][pickerDi]=pickerStart;
+  }
+  refreshTot(pickerEi);
+  buildPlanning();
+  closeTimePicker();
+  autoSave();
+}
+
+function applyQuickSlot(range){
+  const parts=range.split("-");
+  pickerStart=parts[0];
+  pickerEnd=parts[1];
+  document.querySelectorAll(".abs-btn").forEach(b=>b.classList.remove("active"));
+  renderTimeGrid();
+  updateModalResult();
+}
+
+function applyQuickSlotDirect(range){
+  if(!planning[pickerEi][pickerSk])planning[pickerEi][pickerSk]=Array(7).fill("");
+  planning[pickerEi][pickerSk][pickerDi]=range;
+  refreshTot(pickerEi);
+  buildPlanning();
+  closeTimePicker();
+  autoSave();
+}
+
+function closeTimePicker(){
+  document.getElementById("time-modal").style.display="none";
+}
+
+
+// ── STATS ──────────────────────────────────────────────────
+function buildStats(){
+  const csal=(parseFloat(document.getElementById("csal").value)||23)/100;
+  const cpat=(parseFloat(document.getElementById("cpat").value)||45)/100;
+  const msup=(parseFloat(document.getElementById("msup").value)||25)/100;
+  const sems=getSemaines();
+
+  // Metrics
+  const totalH=employes.reduce((a,_,ei)=>a+getAllHMois(ei),0);
+  const totalAbsCP=employes.reduce((a,_,ei)=>a+getAbsCounts(ei).cp,0);
+  const totalAbsMal=employes.reduce((a,_,ei)=>a+getAbsCounts(ei).mal,0);
+  let totalCout=0;
+  employes.forEach((_,ei)=>{
+    const hT=getAllHMois(ei);
+    const hC=hContractEdit[ei]*4.33;
+    const hN=Math.min(hT,hC),hS=Math.max(0,hT-hC);
+    const brut=hTot>0?hN*tauxEdit[ei]+hS*tauxEdit[ei]*(1+msup):0;
+    const isFL=contratEdit[ei]==="freelance";
+    totalCout+=brut+(isFL?0:brut*cpat)+primes[ei];
+  });
+  const terrOuverts=terrainStatuts.filter(s=>s==="ouvert").length;
+
+  document.getElementById("stats-metrics").innerHTML=`
+    <div class="metric"><div class="metric-label">Heures totales mois</div><div class="metric-val">${hToStr(totalH)}</div></div>
+    <div class="metric"><div class="metric-label">Coût salarial total</div><div class="metric-val" style="font-size:17px">${fmt(totalCout)}</div></div>
+    <div class="metric"><div class="metric-label">Terrains disponibles</div><div class="metric-val" style="color:${terrOuverts<4?"#856404":"#1e8449"}">${terrOuverts}/4</div></div>
+    <div class="metric"><div class="metric-label">Absences du mois</div><div class="metric-val" style="color:${totalAbsCP+totalAbsMal>0?"#b7770d":"#1e8449"}">${totalAbsCP+totalAbsMal}j</div></div>`;
+
+  // Chart heures - simple bar chart HTML
+  const maxH=Math.max(...employes.map((_,ei)=>getAllHMois(ei)),1);
+  document.getElementById("chart-heures").innerHTML=employes.map((emp,ei)=>{
+    const h=getAllHMois(ei);
+    const hC=hContractEdit[ei]*4.33;
+    const pct=Math.round((h/Math.max(maxH,1))*100);
+    const pctC=Math.round((hC/Math.max(maxH,1))*100);
+    const over=h>hC+1,under=h<hC-1;
+    return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="width:75px;font-size:12px;font-weight:600;color:${emp.txt};text-align:right">${emp.nom}</div>
+      <div style="flex:1;position:relative;height:22px">
+        <div style="position:absolute;top:0;left:0;height:100%;background:#e8ecf0;border-radius:4px;width:100%"></div>
+        <div style="position:absolute;top:0;left:0;height:100%;background:${emp.bg};border:1.5px solid ${emp.txt};border-radius:4px;width:${pct}%;transition:width .4s"></div>
+        <div style="position:absolute;top:0;left:${pctC}%;height:100%;width:2px;background:#e74c3c;z-index:2" title="Heures contract."></div>
+      </div>
+      <div style="width:65px;font-size:11px;font-weight:700;color:${over?"#1e8449":under?"#c0392b":"#1A5276"}">${hToStr(h)}</div>
+    </div>`;
+  }).join("")+`<div style="font-size:10px;color:#aaa;margin-top:4px"><span style="display:inline-block;width:10px;height:10px;background:#e74c3c;border-radius:2px;margin-right:4px"></span>Ligne rouge = heures contractuelles</div>`;
+
+  // Chart coûts
+  let couts=employes.map((_,ei)=>{
+    const hT=getAllHMois(ei);
+    const hC=hContractEdit[ei]*4.33;
+    const hN=Math.min(hT,hC),hS=Math.max(0,hT-hC);
+    const brut=hTot>0?hN*tauxEdit[ei]+hS*tauxEdit[ei]*(1+msup):0;
+    const isFL=contratEdit[ei]==="freelance";
+    return brut+(isFL?0:brut*cpat)+primes[ei];
+  });
+  const maxC=Math.max(...couts,1);
+  document.getElementById("chart-couts").innerHTML=employes.map((emp,ei)=>{
+    const pct=Math.round((couts[ei]/maxC)*100);
+    return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="width:75px;font-size:12px;font-weight:600;color:${emp.txt};text-align:right">${emp.nom}</div>
+      <div style="flex:1;position:relative;height:22px">
+        <div style="position:absolute;top:0;left:0;height:100%;background:#e8ecf0;border-radius:4px;width:100%"></div>
+        <div style="position:absolute;top:0;left:0;height:100%;background:${emp.bg};border:1.5px solid ${emp.txt};border-radius:4px;width:${pct}%;transition:width .4s"></div>
+      </div>
+      <div style="width:75px;font-size:11px;font-weight:700;color:#b7770d">${fmt(couts[ei])}</div>
+    </div>`;
+  }).join("");
+
+  // Chart présences semaine par semaine
+  document.getElementById("chart-presences").innerHTML=`<div style="overflow-x:auto"><table style="width:100%;font-size:12px;border-collapse:collapse">
+    <thead><tr><th style="text-align:left;padding:6px">Employé</th>${sems.map(s=>`<th style="text-align:center;padding:6px">S${s.numISO}<br><span style="font-size:9px;font-weight:400">${s.range}</span></th>`).join("")}<th style="text-align:center">Total</th></tr></thead>
+    <tbody>${employes.map((emp,ei)=>{
+      const semH=sems.map(sem=>getSemH(ei,sem.key));
+      const tot=semH.reduce((a,b)=>a+b,0);
+      return `<tr><td style="padding:6px"><div class="emp-cell"><div class="avatar" style="background:${emp.bg};color:${emp.txt}">${av(emp.nom)}</div>${emp.nom}</div></td>
+        ${semH.map(h=>{
+          const pct=Math.min(100,Math.round(h/(hContractEdit[ei]*7/5||35)*100));
+          return `<td style="text-align:center;padding:4px">
+            <div style="font-size:11px;font-weight:700;color:${h===0?"#ccc":"#1A5276"}">${h>0?hToStr(h):"—"}</div>
+            <div style="background:#eee;border-radius:4px;height:5px;margin:3px auto;width:60px"><div style="background:${emp.txt};height:5px;border-radius:4px;width:${pct}%"></div></div>
+          </td>`;
+        }).join("")}
+        <td style="text-align:center;padding:4px;font-weight:700;color:${emp.txt}">${hToStr(tot)}</td>
+      </tr>`;
+    }).join("")}</tbody>
+  </table></div>`;
+}
+
+// ── ADD EMPLOYEE ──────────────────────────────────────────
+function addEmploye(){
+  const nom=document.getElementById("new-emp-nom").value.trim();
+  const taux=parseFloat(document.getElementById("new-emp-taux").value)||11.88;
+  const hCont=35;
+  const contrat=document.getElementById("new-emp-contrat").value;
+  if(!nom){alert("Entrez un prénom !");return;}
+  // Pick a color not yet used
+  const colors=[
+    {bg:"#e8f8f5",txt:"#0e6655"},
+    {bg:"#f9f0ff",txt:"#6c3483"},
+    {bg:"#fff0f0",txt:"#922b21"},
+    {bg:"#f0f4ff",txt:"#1a5276"},
+    {bg:"#fffbe6",txt:"#7d6608"},
+    {bg:"#f0fff4",txt:"#1e8449"},
+  ];
+  const c=colors[employes.length%colors.length];
+  employes.push({nom,taux,hContract:hCont,bg:c.bg,txt:c.txt,contrat});
+  tauxEdit.push(taux);
+  hContractEdit.push(hCont);
+  contratEdit.push(contrat);
+  primes.push(0);
+  cpAcquis.push(25);
+  // Add empty planning slots for new employee
+  planning.push({});
+  updateMonth();
+  // clear fields
+  document.getElementById("new-emp-nom").value="";
+  document.getElementById("new-emp-taux").value="";
+  document.getElementById("new-emp-hcont").value="";
+  autoSave();
+}
+
+
+// ── EXPORT PLANNING PDF ────────────────────────────────────
+function exportPlanningPDF(){
+  const sems=getSemaines();
+  const s=sems[curSem];if(!s)return;
+  const semKey=s.key;
+  const m=document.getElementById("month-sel").value;
+  const y=document.getElementById("year-sel").value;
+  const joursLabels=["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
+
+  let tableHead=`<tr><th style="background:#1A5276;color:#fff;padding:10px 14px;text-align:left;min-width:120px">Employé</th>`;
+  s.joursAvecDates.forEach((j,di)=>{
+    const ferBg=j.ferie?"#17a2b8":"#1A5276";
+    const ferLabel=j.ferie?`<div style="font-size:9px;opacity:.9">🎌 ${j.ferie}</div>`:"";
+    tableHead+=`<th style="background:${ferBg};color:#fff;padding:10px 8px;text-align:center;min-width:95px">${joursLabels[di]}<br><span style="font-size:10px;font-weight:400;opacity:.8">${j.date}</span>${ferLabel}</th>`;
+  });
+  tableHead+=`<th style="background:#1A5276;color:#fff;padding:10px 8px;text-align:center">Total</th></tr>`;
+
+  let tableBody="";
+  employes.forEach((emp,ei)=>{
+    let row=`<tr>`;
+    row+=`<td style="padding:8px 12px;border-bottom:1px solid #eee;font-weight:700;background:${emp.bg};color:${emp.txt}">${emp.nom}</td>`;
+    for(let d=0;d<7;d++){
+      const v=(planning[ei][semKey]||[])[d]||"";
+      const absType=getAbsType(v);
+      const parsed=parseHeures(v);
+      let cellBg="#fff",cellColor="#333",cellText="—";
+      if(absType==="cp"){cellBg="#fff3cd";cellColor="#856404";cellText="🏖️ CP";}
+      else if(absType==="mal"){cellBg="#f8d7da";cellColor="#721c24";cellText="🤒 Maladie";}
+      else if(absType==="fer"){cellBg="#d1ecf1";cellColor="#0c5460";cellText="🎌 Férié";}
+      else if(absType==="repos"){cellBg="#f0f0f0";cellColor="#888";cellText="😴 Repos";}
+      else if(v&&parsed>0){
+        const p=v.split("-");
+        cellBg="#e8f4fd";cellColor="#1A5276";
+        cellText=`<div style="font-size:11px">${(p[0]||"").trim()}</div><div style="font-size:11px">${(p[1]||"").trim()}</div><div style="font-size:12px;font-weight:700">${hToStr(parsed)}</div>`;
+      }
+      row+=`<td style="padding:6px 4px;border-bottom:1px solid #eee;border-left:1px solid #eee;text-align:center;background:${cellBg};color:${cellColor};font-size:12px">${cellText}</td>`;
+    }
+    const totSem=getSemH(ei,semKey);
+    row+=`<td style="padding:6px 8px;border-bottom:1px solid #eee;border-left:2px solid #1A5276;text-align:center;font-weight:700;color:#1A5276;font-size:13px">${totSem>0?hToStr(totSem):"—"}</td>`;
+    row+=`</tr>`;
+    tableBody+=row;
+  });
+
+  const note=notes[semKey]||"";
+  const w=window.open("","_blank");
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Planning ${s.label} — ${m} ${y}</title>
+  <style>
+    body{font-family:Arial,sans-serif;background:#f5f7fa;padding:24px;color:#1a1a1a}
+    .wrap{max-width:950px;margin:0 auto;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.12)}
+    .header{background:#111;color:#FFD700;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+    .header h2{font-size:18px;margin:0}
+    .header span{font-size:13px;opacity:.8}
+    .sub{background:#1A5276;color:#fff;padding:8px 24px;font-size:13px;font-weight:600}
+    table{width:100%;border-collapse:collapse}
+    .no-print{margin:16px 0;text-align:center}
+    .note{padding:10px 24px 16px;font-size:12px;color:#777;font-style:italic}
+    @media print{body{background:#fff;padding:0}.no-print{display:none}.wrap{box-shadow:none}}
+  </style></head><body>
+  <div class="no-print"><button onclick="window.print()" style="padding:10px 28px;background:#1A5276;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700">🖨️ Imprimer / Enregistrer en PDF</button></div>
+  <div class="wrap">
+    <div class="header"><h2>🎾 Padel — Planning de la semaine</h2><span>${m} ${y}</span></div>
+    <div class="sub">📅 ${s.label} — S${s.numISO} &nbsp;·&nbsp; ${s.range}</div>
+    <table><thead>${tableHead}</thead><tbody>${tableBody}</tbody></table>
+    ${note?`<div class="note">📝 Note : ${note}</div>`:""}
+  </div>
+  </body></html>`);
+  w.document.close();
+}
+
+// ── ENVOYER PLANNING PAR MAIL ──────────────────────────────
+function envoyerPlanningMail(){
+  const sems=getSemaines();
+  const s=sems[curSem];if(!s)return;
+  const semKey=s.key;
+  const m=document.getElementById("month-sel").value;
+  const y=document.getElementById("year-sel").value;
+  const joursLabels=["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
+
+  const sujet=`Planning Padel — ${s.label} (S${s.numISO}) — ${m} ${y}`;
+  let corps=`PLANNING PADEL — ${s.label} — S${s.numISO}\n`;
+  corps+=`Période : ${s.range} | ${m} ${y}\n`;
+  corps+=`${"─".repeat(55)}\n\n`;
+
+  employes.forEach((emp,ei)=>{
+    corps+=`${emp.nom.toUpperCase()}\n`;
+    let hasShift=false;
+    for(let d=0;d<7;d++){
+      const v=(planning[ei][semKey]||[])[d]||"";
+      const absType=getAbsType(v);
+      const parsed=parseHeures(v);
+      let label="";
+      if(absType==="cp")label="CP (congé payé)";
+      else if(absType==="mal")label="Maladie";
+      else if(absType==="fer")label="Férié";
+      else if(absType==="repos")label="Repos";
+      else if(v&&parsed>0)label=`${v}  (${hToStr(parsed)})`;
+      if(label){corps+=`   ${joursLabels[d]} ${s.joursAvecDates[d].date} : ${label}\n`;hasShift=true;}
+    }
+    if(!hasShift)corps+=`   (aucune heure saisie)\n`;
+    const totSem=getSemH(ei,semKey);
+    if(totSem>0)corps+=`   Total semaine : ${hToStr(totSem)}\n`;
+    corps+="\n";
+  });
+
+  const note=notes[semKey]||"";
+  if(note)corps+=`Note : ${note}\n\n`;
+  corps+=`${"─".repeat(55)}\n`;
+  corps+=`Planning généré depuis Gestion Padel`;
+
+  const mailto=`mailto:?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corps)}`;
+  window.location.href=mailto;
+}
+
+// ── IMPRESSION PLANNING ───────────────────────────────────
+function imprimerPlanning(){
+  // S'assurer qu'on est sur l'onglet planning
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById("page-planning").classList.add("active");
+  setTimeout(()=>window.print(),100);
+}
+
+// ── LOAD / CLEAR ──────────────────────────────────────────
+async function loadFromStorage(){
+  try{
+    showStatus('⏳ Chargement...','#f39c12');
+    const data=await supaRead();
+    if(!data||Object.keys(data).length===0){showStatus('');return false;}
+    applyData(data);
+    showStatus('✓ Données chargées');
+    // Polling toutes les 10s pour sync multi-utilisateurs
+    setInterval(async()=>{
+      try{
+        const d=await supaRead();
+        if(d&&Object.keys(d).length>0){applyData(d);showStatus('🔄 Synchronisé','#3498db');}
+      }catch(e){}
+    },10000);
+    return true;
+  }catch(e){console.warn('Load error:',e);showStatus('');return false;}
+}
+
+async function clearAllData(){
+  if(!confirm('Effacer toutes les données pour tout le monde ?'))return;
+  await supaWrite({});
+  location.reload();
+}
+
+// ── INIT ───────────────────────────────────────────────────
+(async function(){
+  const loaded = await loadFromStorage();
+  if(!loaded){ updateMonth(); calcPayes(); }
+  document.getElementById("month-sel").addEventListener("change",()=>{ updateMonth(); setTimeout(autoSave,400); });
+  document.getElementById("year-sel").addEventListener("change",()=>{ updateMonth(); setTimeout(autoSave,400); });
+  ["csal","cpat","msup"].forEach(id=>{
+    document.getElementById(id).addEventListener("change", autoSave);
+  });
+})();
+</script>
+</body>
+</html>
